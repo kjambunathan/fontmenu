@@ -24,9 +24,9 @@ the one under current line.
 
 # Issues on Emacs 25.1.1
 
-Above steps were repeated on `Emacs 25.1.1`.  The library works no
-longer the same.  This seems like a regression in `Emacs 25.1.1`.
-
-![Default behaviour on Emacs 25.1.1](images/Screenshot from 2016-11-22 10-11-34.png)
+Above steps were repeated on `Emacs 25.1.1`.  But the results were
+different and not along the expected lines i.e., Emacs no longer
+honors the custom `face` requested for sample text.  This is a
+regression in `Emacs 25.1.1`.
 
 ![Behaviour on Emacs 25.1.1, with a chosen text and script](images/Screenshot from 2016-11-22 10-12-22.png)
