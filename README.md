@@ -27,6 +27,6 @@ the one under current line.
 Above steps were repeated on `Emacs 25.1.1`.  But the results were
 different and not along the expected lines i.e., Emacs no longer
 honors the custom `face` requested for sample text.  This is a
-regression in `Emacs 25.1.1`.
+regression in `Emacs 25.1.1`.  See [Bug#845754](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=845754).
 
 ![Behaviour on Emacs 25.1.1, with a chosen text and script](images/Screenshot from 2016-11-22 10-12-22.png)
