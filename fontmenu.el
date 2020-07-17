@@ -24,21 +24,31 @@
 
 ;;; Commentary:
 
-;; Once you load this file, a buffer named "*Font Menu*" is to
-;; created.  This buffer displays a sample text in all available
-;; fonts.
+;; Call the command `fontmenu' to create a buffer which displays text
+;; in all available fonts.
 ;;
-;; 1. Press 't' to change the sample text.  See `fontmenu-set-text'.
+;; 1. Press `t' to change the sample text.  See `fontmenu-set-text'.
 ;; 2. Press `s' to narrow the fonts to a chosen script.  See
 ;;    `fontmenu-set-script'.
 ;; 3. Press `C-m' to change the frame font to the one under current line.
 ;;    See `fontmenu-set-frame-font'.
 
-(require 'tabulated-list)
-
 ;;; Code:
 
-(defvar-local fontmenu-text "Press `t' to change sample text.  Press `s' to filter fonts by script."
+(require 'tabulated-list)
+
+(defgroup fontmenu nil
+  "Examine how a text is rendered in different fonts."
+  :group 'faces)
+
+(defcustom fontmenu-default-text
+  "Press `t' to change sample text.  Press `s' to filter fonts by script."
+  "Default text to display."
+  :group 'fontmenu
+  :type 'string)
+
+(defvar-local fontmenu-text
+  fontmenu-default-text
   "Text to display.")
 
 (defvar-local fontmenu-script nil
@@ -55,7 +65,7 @@
   "Local keymap for `fontmenu-mode' buffers.")
 
 (define-derived-mode fontmenu-mode tabulated-list-mode "Font Menu"
-  "Display the string in `fontmenu-text' in all available fonts.  
+  "Display the string in `fontmenu-text' in all available fonts.
 
  \\<fontmenu-mode-map> \\{fontmenu-mode-map}"
   (setq tabulated-list-format
@@ -67,18 +77,6 @@
   (fontmenu--refresh)
   (tabulated-list-init-header)
   (tabulated-list-print))
-
-(defun fontmenu ()
-  "Examine how a text is rendered in all available font families.
-Use `fontmenu-set-text' to change the sample text.  Use
-`fontmenu-set-script' to change the script.  Use
-`fontmenu-set-frame-font' to change the frame font to the font in
-the current line."
-  (interactive)
-  (let ((buf (get-buffer-create "*Font Menu*")))
-    (with-current-buffer buf
-      (fontmenu-mode))
-    (switch-to-buffer buf)))
 
 (defun fontmenu--refresh ()
   "Re-populate `tabulated-list-entries'."
@@ -97,14 +95,7 @@ the current line."
 			(propertize s 'face (list :family f))))))
 	   f))))
 
-(defun fontmenu-set-text (s)
-  "Set the sample text to S."
-  (interactive "sSample Text: ")
-  (when (derived-mode-p 'fontmenu-mode)
-    (setq fontmenu-text (if (string= s "") (default-value 'fontmenu-text) s))
-    (fontmenu--refresh)
-    (tabulated-list-print)))
-
+;;;###autoload
 (defun fontmenu-set-script (&optional s)
   "Set preferred script to S.
 S is either nil or one of the `script-representative-chars'."
@@ -119,15 +110,36 @@ S is either nil or one of the `script-representative-chars'."
     (fontmenu--refresh)
     (tabulated-list-print)))
 
+;;;###autoload
 (defun fontmenu-set-frame-font ()
   "Set the frame font to the one in current line."
   (interactive)
   (when (derived-mode-p 'fontmenu-mode)
       (let ((f (tabulated-list-get-id)))
-	(when (and f (y-or-n-p (format "Set frame font to %s " f)))
+	(when (and f (y-or-n-p (format "Set frame font to %s?" f)))
 	  (set-frame-font f nil t)))))
 
-(call-interactively 'fontmenu)
+;;;###autoload
+(defun fontmenu-set-text (s)
+  "Set the sample text to S."
+  (interactive "sSample Text: ")
+  (when (derived-mode-p 'fontmenu-mode)
+    (setq fontmenu-text (if (string= s "") (default-value 'fontmenu-text) s))
+    (fontmenu--refresh)
+    (tabulated-list-print)))
+
+;;;###autoload
+(defun fontmenu ()
+  "Examine how a text is rendered in all available font families.
+Use `fontmenu-set-text' to change the sample text.  Use
+`fontmenu-set-script' to change the script.  Use
+`fontmenu-set-frame-font' to change the frame font to the font in
+the current line."
+  (interactive)
+  (let ((buf (get-buffer-create "*Font Menu*")))
+    (with-current-buffer buf
+      (fontmenu-mode))
+    (switch-to-buffer buf)))
 
 (provide 'fontmenu)
 
