@@ -42,16 +42,16 @@
   :group 'faces)
 
 (defcustom fontmenu-default-text
-  "Press `t' to change sample text.  Press `s' to filter fonts by script."
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
   "Default text to display."
   :group 'fontmenu
   :type 'string)
 
-(defvar-local fontmenu-text
+(defvar-local fontmenu--text
   fontmenu-default-text
   "Text to display.")
 
-(defvar-local fontmenu-script nil
+(defvar-local fontmenu--script nil
   "Display only fonts that support this script.")
 
 (defvar fontmenu-mode-map
@@ -81,15 +81,15 @@
 (defun fontmenu--refresh ()
   "Re-populate `tabulated-list-entries'."
   (let ((f (delete-dups
-	    (if fontmenu-script
+	    (if fontmenu--script
 		(mapcar (lambda (spec)
 			  (symbol-name (font-get spec :family)))
-			(list-fonts  (font-spec :script fontmenu-script)))
+			(list-fonts  (font-spec :script fontmenu--script)))
 	      (font-family-list)))))
     (setq tabulated-list-entries
 	  (mapcar
 	   (lambda (f)
-	     (let ((s (or fontmenu-text f)))
+	     (let ((s (or fontmenu--text f)))
 	       (list f (vector
 			(cons f `(font-view ,f action fontmenu-set-frame-font))
 			(propertize s 'face (list :family f))))))
@@ -101,12 +101,11 @@
 S is either nil or one of the `script-representative-chars'."
   (interactive
    (list (let ((s (completing-read
-		   (format "Script (%s): " (or fontmenu-script ""))
+		   (format "Script (%s): " (or fontmenu--script ""))
 		   script-representative-chars nil t)))
 	   (if (string= s "") nil (intern s)))))
-
   (when (derived-mode-p 'fontmenu-mode)
-    (setq fontmenu-script s)
+    (setq fontmenu--script s)
     (fontmenu--refresh)
     (tabulated-list-print)))
 
@@ -115,16 +114,16 @@ S is either nil or one of the `script-representative-chars'."
   "Set the frame font to the one in current line."
   (interactive)
   (when (derived-mode-p 'fontmenu-mode)
-      (let ((f (tabulated-list-get-id)))
-	(when (and f (y-or-n-p (format "Set frame font to %s?" f)))
-	  (set-frame-font f nil t)))))
+    (let ((f (tabulated-list-get-id)))
+      (when (and f (y-or-n-p (format "Set frame font to %s? " f)))
+        (set-frame-font f nil t)))))
 
 ;;;###autoload
 (defun fontmenu-set-text (s)
   "Set the sample text to S."
   (interactive "sSample Text: ")
   (when (derived-mode-p 'fontmenu-mode)
-    (setq fontmenu-text (if (string= s "") (default-value 'fontmenu-text) s))
+    (setq fontmenu--text (if (string= s "") (default-value 'fontmenu--text) s))
     (fontmenu--refresh)
     (tabulated-list-print)))
 
